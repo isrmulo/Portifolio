@@ -5,14 +5,14 @@ import emailjs from '@emailjs/browser';
 const ContactSection: React.FC = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
+    user_name: '',
+    user_email: '',
     subject: '',
     message: ''
   });
   const [formErrors, setFormErrors] = useState({
-    name: '',
-    email: '',
+    user_name: '',
+    user_email: '',
     subject: '',
     message: ''
   });
@@ -22,32 +22,32 @@ const ContactSection: React.FC = () => {
   const validateForm = () => {
     let valid = true;
     const errors = {
-      name: '',
-      email: '',
+      user_name: '',
+      user_email: '',
       subject: '',
       message: ''
     };
 
-    if (!formData.name.trim()) {
-      errors.name = 'Name is required';
+    if (!formData.user_name.trim()) {
+      errors.user_name = 'Nome é obrigatório';
       valid = false;
     }
 
-    if (!formData.email.trim()) {
-      errors.email = 'Email is required';
+    if (!formData.user_email.trim()) {
+      errors.user_email = 'Email é obrigatório';
       valid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
-      errors.email = 'Email is invalid';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.user_email)) {
+      errors.user_email = 'Email inválido';
       valid = false;
     }
 
     if (!formData.subject.trim()) {
-      errors.subject = 'Subject is required';
+      errors.subject = 'Assunto é obrigatório';
       valid = false;
     }
 
     if (!formData.message.trim()) {
-      errors.message = 'Message is required';
+      errors.message = 'Mensagem é obrigatória';
       valid = false;
     }
 
@@ -62,7 +62,7 @@ const ContactSection: React.FC = () => {
       [name]: value
     }));
     
-    // Clear error when user starts typing
+    // Limpa o erro quando o usuário começa a digitar
     if (formErrors[name as keyof typeof formErrors]) {
       setFormErrors(prev => ({
         ...prev,
@@ -88,7 +88,7 @@ const ContactSection: React.FC = () => {
         console.log('Email enviado com sucesso:', result);
         setIsSubmitting(false);
         setSubmitSuccess(true);
-        setFormData({ name: '', email: '', subject: '', message: '' });
+        setFormData({ user_name: '', user_email: '', subject: '', message: '' });
         
         setTimeout(() => {
           setSubmitSuccess(false);
@@ -185,14 +185,14 @@ const ContactSection: React.FC = () => {
                   type="text"
                   id="user_name"
                   name="user_name"
-                  value={formData.name}
+                  value={formData.user_name}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${
-                    formErrors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    formErrors.user_name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
                   placeholder="Seu Nome"
                 />
-                {formErrors.name && <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>}
+                {formErrors.user_name && <p className="mt-1 text-sm text-red-500">{formErrors.user_name}</p>}
               </div>
               
               <div>
@@ -203,14 +203,14 @@ const ContactSection: React.FC = () => {
                   type="email"
                   id="user_email"
                   name="user_email"
-                  value={formData.email}
+                  value={formData.user_email}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${
-                    formErrors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    formErrors.user_email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
                   placeholder="Seu Email"
                 />
-                {formErrors.email && <p className="mt-1 text-sm text-red-500">{formErrors.email}</p>}
+                {formErrors.user_email && <p className="mt-1 text-sm text-red-500">{formErrors.user_email}</p>}
               </div>
 
               <div>
