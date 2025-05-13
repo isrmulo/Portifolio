@@ -77,18 +77,27 @@ const ContactSection: React.FC = () => {
       setIsSubmitting(true);
       
       try {
-        await emailjs.send(
+        const templateParams = {
+          name: formData.name,
+          email: formData.email,
+          subject: formData.subject,
+          message: formData.message
+        };
+
+        console.log('Enviando email com:', {
+          serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          templateParams
+        });
+
+        const result = await emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          {
-            name: formData.name,
-            email: formData.email,
-            subject: formData.subject,
-            message: formData.message
-          },
+          templateParams,
           import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         );
 
+        console.log('Email enviado com sucesso:', result);
         setIsSubmitting(false);
         setSubmitSuccess(true);
         setFormData({ name: '', email: '', subject: '', message: '' });
@@ -97,9 +106,14 @@ const ContactSection: React.FC = () => {
           setSubmitSuccess(false);
         }, 5000);
       } catch (error) {
-        console.error('Erro ao enviar email:', error);
+        console.error('Erro detalhado ao enviar email:', {
+          error,
+          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? 'Presente' : 'Ausente',
+          serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID ? 'Presente' : 'Ausente',
+          templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID ? 'Presente' : 'Ausente'
+        });
         setIsSubmitting(false);
-        alert('Erro ao enviar mensagem. Por favor, tente novamente.');
+        alert('Erro ao enviar mensagem. Por favor, tente novamente em alguns instantes ou entre em contato através do email.');
       }
     }
   };
@@ -123,7 +137,7 @@ const ContactSection: React.FC = () => {
                   <Mail size={20} className="text-gray-800 dark:text-gray-200 mt-1 mr-4" />
                   <div>
                     <h4 className="font-medium text-gray-900 dark:text-white">Email</h4>
-                    <p className="text-gray-600 dark:text-gray-300">romloodorico702@gmail.com</p>
+                    <p className="text-gray-600 dark:text-gray-300">romuloodorico702@gmail.com</p>
                   </div>
                 </div>
                 <div className="flex items-start">
