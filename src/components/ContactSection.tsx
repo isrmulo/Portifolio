@@ -1,18 +1,16 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
-import emailjs from '@emailjs/browser';
 
 const ContactSection: React.FC = () => {
-  const formRef = useRef<HTMLFormElement>(null);
   const [formData, setFormData] = useState({
-    user_name: '',
-    user_email: '',
+    name: '',
+    email: '',
     subject: '',
     message: ''
   });
   const [formErrors, setFormErrors] = useState({
-    user_name: '',
-    user_email: '',
+    name: '',
+    email: '',
     subject: '',
     message: ''
   });
@@ -22,22 +20,22 @@ const ContactSection: React.FC = () => {
   const validateForm = () => {
     let valid = true;
     const errors = {
-      user_name: '',
-      user_email: '',
+      name: '',
+      email: '',
       subject: '',
       message: ''
     };
 
-    if (!formData.user_name.trim()) {
-      errors.user_name = 'Nome é obrigatório';
+    if (!formData.name.trim()) {
+      errors.name = 'Nome é obrigatório';
       valid = false;
     }
 
-    if (!formData.user_email.trim()) {
-      errors.user_email = 'Email é obrigatório';
+    if (!formData.email.trim()) {
+      errors.email = 'Email é obrigatório';
       valid = false;
-    } else if (!/^\S+@\S+\.\S+$/.test(formData.user_email)) {
-      errors.user_email = 'Email inválido';
+    } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      errors.email = 'Email inválido';
       valid = false;
     }
 
@@ -71,53 +69,34 @@ const ContactSection: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    if (validateForm() && formRef.current) {
+    if (validateForm()) {
       setIsSubmitting(true);
       
       try {
-        // Log das informações que serão enviadas
-        console.log('Tentando enviar email com:', {
-          form: formRef.current,
-          service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          public_key: import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? 'Configurado' : 'Não configurado'
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        
+        const response = await fetch('https://formsubmit.co/romuloodorico702@gmail.com', {
+          method: 'POST',
+          body: formData
         });
 
-        // Criar objeto com os dados do formulário
-        const templateParams = {
-          from_name: formData.user_name,
-          from_email: formData.user_email,
-          subject: formData.subject,
-          message: formData.message,
-        };
+        if (!response.ok) {
+          throw new Error('Falha ao enviar o formulário');
+        }
 
-        // Tentar enviar usando send em vez de sendForm
-        const result = await emailjs.send(
-          import.meta.env.VITE_EMAILJS_SERVICE_ID,
-          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          templateParams,
-          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-        );
-
-        console.log('Email enviado com sucesso:', result);
         setIsSubmitting(false);
         setSubmitSuccess(true);
-        setFormData({ user_name: '', user_email: '', subject: '', message: '' });
+        setFormData({ name: '', email: '', subject: '', message: '' });
         
         setTimeout(() => {
           setSubmitSuccess(false);
         }, 5000);
       } catch (error: any) {
-        console.error('Erro detalhado ao enviar email:', {
-          error: error,
-          message: error.message,
-          text: error.text,
-          name: error.name,
-          stack: error.stack
-        });
+        console.error('Erro ao enviar mensagem:', error);
         setIsSubmitting(false);
         alert(`Erro ao enviar mensagem: ${error.message || 'Tente novamente em alguns instantes.'}`);
       }
@@ -199,41 +178,44 @@ const ContactSection: React.FC = () => {
           </div>
           
           <div>
-            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+            <form action="https://formsubmit.co/romuloodorico702@gmail.com" method="POST" onSubmit={handleSubmit} className="space-y-6">
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_next" value={window.location.href} />
+              
               <div>
-                <label htmlFor="user_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Nome
                 </label>
                 <input
                   type="text"
-                  id="user_name"
-                  name="user_name"
-                  value={formData.user_name}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${
-                    formErrors.user_name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    formErrors.name ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
                   placeholder="Seu Nome"
                 />
-                {formErrors.user_name && <p className="mt-1 text-sm text-red-500">{formErrors.user_name}</p>}
+                {formErrors.name && <p className="mt-1 text-sm text-red-500">{formErrors.name}</p>}
               </div>
               
               <div>
-                <label htmlFor="user_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Email
                 </label>
                 <input
                   type="email"
-                  id="user_email"
-                  name="user_email"
-                  value={formData.user_email}
+                  id="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                   className={`w-full px-4 py-2 border ${
-                    formErrors.user_email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                    formErrors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
                   } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
                   placeholder="Seu Email"
                 />
-                {formErrors.user_email && <p className="mt-1 text-sm text-red-500">{formErrors.user_email}</p>}
+                {formErrors.email && <p className="mt-1 text-sm text-red-500">{formErrors.email}</p>}
               </div>
 
               <div>
