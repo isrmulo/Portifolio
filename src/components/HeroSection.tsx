@@ -36,7 +36,7 @@ const HeroSection: React.FC = () => {
             Meus trabalhos
           </a>
           <a
-            href="/resume.pdf"
+            href="/public/curriculo-romulo.pdf" download="curriculo-romulo.pdf"
             className="px-8 py-3 bg-transparent border border-gray-900 dark:border-white text-gray-900 dark:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-300 flex items-center justify-center"
           >
             <FileText size={18} className="mr-2" />
