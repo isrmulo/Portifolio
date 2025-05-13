@@ -1,15 +1,18 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import emailjs from '@emailjs/browser';
 
 const ContactSection: React.FC = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    subject: '',
     message: ''
   });
   const [formErrors, setFormErrors] = useState({
     name: '',
     email: '',
+    subject: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -20,6 +23,7 @@ const ContactSection: React.FC = () => {
     const errors = {
       name: '',
       email: '',
+      subject: '',
       message: ''
     };
 
@@ -33,6 +37,11 @@ const ContactSection: React.FC = () => {
       valid = false;
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       errors.email = 'Email is invalid';
+      valid = false;
+    }
+
+    if (!formData.subject.trim()) {
+      errors.subject = 'Subject is required';
       valid = false;
     }
 
@@ -61,23 +70,37 @@ const ContactSection: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
       setIsSubmitting(true);
       
-      // Simulate form submission
-      setTimeout(() => {
+      try {
+        await emailjs.send(
+          import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          {
+            name: formData.name,
+            email: formData.email,
+            subject: formData.subject,
+            message: formData.message
+          },
+          import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        );
+
         setIsSubmitting(false);
         setSubmitSuccess(true);
-        setFormData({ name: '', email: '', message: '' });
+        setFormData({ name: '', email: '', subject: '', message: '' });
         
-        // Reset success message after 5 seconds
         setTimeout(() => {
           setSubmitSuccess(false);
         }, 5000);
-      }, 1500);
+      } catch (error) {
+        console.error('Erro ao enviar email:', error);
+        setIsSubmitting(false);
+        alert('Erro ao enviar mensagem. Por favor, tente novamente.');
+      }
     }
   };
 
@@ -191,6 +214,24 @@ const ContactSection: React.FC = () => {
                   placeholder="Seu Email"
                 />
                 {formErrors.email && <p className="mt-1 text-sm text-red-500">{formErrors.email}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="subject" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Assunto
+                </label>
+                <input
+                  type="text"
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-2 border ${
+                    formErrors.subject ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'
+                  } rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 dark:focus:ring-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white`}
+                  placeholder="Assunto"
+                />
+                {formErrors.subject && <p className="mt-1 text-sm text-red-500">{formErrors.subject}</p>}
               </div>
               
               <div>
