@@ -4,14 +4,11 @@ import App from './App.tsx'
 import './index.css'
 import emailjs from '@emailjs/browser'
 
-// Inicializa o EmailJS com configurações
-emailjs.init(import.meta.env.VITE_EMAILJS_PUBLIC_KEY)
-
-// Configura EmailJS para usar CORS
+// Inicializa o EmailJS com configuração de segurança
 emailjs.init({
   publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-  limited: false,
-  cors: 'https://api.emailjs.com'
+  origin: 'https://api.emailjs.com',
+  limitRate: false
 });
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

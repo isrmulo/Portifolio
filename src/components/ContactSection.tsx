@@ -78,10 +78,27 @@ const ContactSection: React.FC = () => {
       setIsSubmitting(true);
       
       try {
-        const result = await emailjs.sendForm(
+        // Log das informações que serão enviadas
+        console.log('Tentando enviar email com:', {
+          form: formRef.current,
+          service_id: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+          template_id: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+          public_key: import.meta.env.VITE_EMAILJS_PUBLIC_KEY ? 'Configurado' : 'Não configurado'
+        });
+
+        // Criar objeto com os dados do formulário
+        const templateParams = {
+          from_name: formData.user_name,
+          from_email: formData.user_email,
+          subject: formData.subject,
+          message: formData.message,
+        };
+
+        // Tentar enviar usando send em vez de sendForm
+        const result = await emailjs.send(
           import.meta.env.VITE_EMAILJS_SERVICE_ID,
           import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-          formRef.current,
+          templateParams,
           import.meta.env.VITE_EMAILJS_PUBLIC_KEY
         );
 
@@ -93,10 +110,16 @@ const ContactSection: React.FC = () => {
         setTimeout(() => {
           setSubmitSuccess(false);
         }, 5000);
-      } catch (error) {
-        console.error('Erro detalhado ao enviar email:', error);
+      } catch (error: any) {
+        console.error('Erro detalhado ao enviar email:', {
+          error: error,
+          message: error.message,
+          text: error.text,
+          name: error.name,
+          stack: error.stack
+        });
         setIsSubmitting(false);
-        alert('Erro ao enviar mensagem. Por favor, tente novamente em alguns instantes.');
+        alert(`Erro ao enviar mensagem: ${error.message || 'Tente novamente em alguns instantes.'}`);
       }
     }
   };
